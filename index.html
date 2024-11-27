@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Perguntas com Imagens</title>
+    <style>
+        /* Ajuste da cor de fundo */
+        body {
+            background: url('.img/ajuda.webp') no-repeat center center fixed;
+            background-size: cover;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.5);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        h1 {
+            color: #e8f8fc;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            animation: glow 1.5s ease-in-out infinite alternate;
+        }
+
+        .score-box {
+            position: absolute;
+            top: 20px;
+            right: -150px;
+            background-color: #1178d3;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+            width: 120px;
+            text-align: center;
+            color: #ffffff;
+            font-size: 1.2em;
+            transition: transform 0.3s ease-in-out;
+            animation: pulse 1s ease-in-out infinite alternate;
+        }
+
+        .score-box:hover {
+            transform: scale(1.1);
+        }
+
+        .question-box {
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .question {
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            color: #ffffff;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        .options button {
+            display: block;
+            width: 100%;
+            margin: 8px 0;
+            padding: 12px;
+            font-size: 1.1em;
+            color: #ffffff;
+            background-color: #1178d3;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        .options button:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 4px 15px rgba(17, 120, 211, 0.5);
+        }
+
+        .feedback {
+            display: none;
+            font-size: 1.2em;
+            color: #e8f8fc;
+            margin-top: 15px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        /* Animações */
+        @keyframes glow {
+            from {
+                color: #e8f8fc;
+            }
+            to {
+                color: #ffffff;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            from {
+                transform: scale(1);
+            }
+            to {
+                transform: scale(1.05);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧩 Jogo das Perguntas 🧩</h1>
+        <div class="score-box" id="score-box">Pontuação: 0</div>
+        
+        <div class="question-box">
+            <div id="question" class="question"></div>
+            <div id="options" class="options"></div>
+            <div id="feedback" class="feedback">🎉 Correto! +500 pontos! 🎉</div>
+        </div>
+    </div>
+
+    <script>
+        // Perguntas e respostas do jogo
+        const perguntas = [
+            {
+                pergunta: "De que cor é o céu?",
+                alternativas: ["The sky is green.", "The sky is blue.", "The sky is red."],
+                resposta: 1
+            },
+            {
+                pergunta: "Quantos dedos você tem?",
+                alternativas: ["I have ten fingers.", "I have twelve fingers.", "I have five fingers."],
+                resposta: 0
+            },
+            {
+                pergunta: "De que cor é uma banana?",
+                alternativas: ["A banana is blue.", "A banana is purple.", "A banana is yellow."],
+                resposta: 2
+            },
+            {
+                pergunta: "Quantas maçãs formam um par?",
+                alternativas: ["Two apples make a pair.", "Three apples make a pair.", "One apple makes a pair."],
+                resposta: 0
+            },
+            {
+                pergunta: "Você pode citar uma fruta vermelha?",
+                alternativas: ["A red fruit is an apple.", "A red fruit is a banana.", "A red fruit is a lemon."],
+                resposta: 0
+            },
+            {
+                pergunta: "Quantas cores tem o arco-íris?",
+                alternativas: ["The rainbow has seven colors.", "The rainbow has five colors.", "The rainbow has three colors."],
+                resposta: 0
+            },
+            {
+                pergunta: "De que cor são os morangos?",
+                alternativas: ["Strawberries are yellow.", "Strawberries are red.", "Strawberries are blue."],
+                resposta: 1
+            },
+            {
+                pergunta: "Você consegue contar até cinco?",
+                alternativas: ["Yes! One, two, three, four, five.", "Yes! One, two, three, four, six.", "Yes! One, two, three, five."],
+                resposta: 0
+            },
+            {
+                pergunta: "De que cor é uma laranja?",
+                alternativas: ["An orange is green.", "An orange is orange.", "An orange is purple."],
+                resposta: 1
+            },
+            {
+                pergunta: "Quantas patas tem um cachorro?",
+                alternativas: ["A dog has four legs.", "A dog has two legs.", "A dog has six legs."],
+                resposta: 0
+            }
+        ];
+
+        // Variáveis do jogo
+        let pontuacao = 0;
+        let indicePergunta = 0;
+
+        // Função para atualizar a pontuação na tela
+        function atualizarPontuacao() {
+            document.getElementById("score-box").innerText = `Pontuação: ${pontuacao}`;
+        }
+
+        // Função para carregar uma nova pergunta
+        function carregarPergunta() {
+            document.getElementById("feedback").style.display = "none";
+            if (indicePergunta < perguntas.length) {
+                const perguntaAtual = perguntas[indicePergunta];
+                document.getElementById("question").innerText = perguntaAtual.pergunta;
+
+                // Carrega as opções de resposta
+                const optionsDiv = document.getElementById("options");
+                optionsDiv.innerHTML = '';
+                perguntaAtual.alternativas.forEach((opcao, index) => {
+                    const botao = document.createElement("button");
+                    botao.innerText = opcao;
+                    botao.onclick = () => verificarResposta(index);
+                    optionsDiv.appendChild(botao);
+                });
+            } else {
+                document.getElementById("question").innerText = "Fim do jogo! Obrigado por jogar!";
+                document.getElementById("options").innerHTML = '';
+            }
+        }
+
+        // Função para verificar a resposta do jogador e adicionar pontos
+        function verificarResposta(resposta) {
+            const respostaCorreta = perguntas[indicePergunta].resposta;
+            const feedbackDiv = document.getElementById("feedback");
+            if (resposta === respostaCorreta) {
+                pontuacao += 500;
+                feedbackDiv.innerText = "🎉 Correto! +500 pontos! 🎉";
+                feedbackDiv.style.color = "#e8f8fc";
+            } else {
+                feedbackDiv.innerText = "❌ Resposta errada.";
+                feedbackDiv.style.color = "red";
+            }
+            feedbackDiv.style.display = "block";
+            indicePergunta++;
+            atualizarPontuacao();
+            setTimeout(carregarPergunta, 1500);
+        }
+
+        // Inicializa o jogo com a primeira pergunta
+        atualizarPontuacao();
+        carregarPergunta();
+    </script>
+</body>
+</html>
